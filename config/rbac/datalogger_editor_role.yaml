@@ -1,0 +1,31 @@
+# permissions for end users to edit dataloggers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: datalogger-editor-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: assessment-repo-content
+    app.kubernetes.io/part-of: assessment-repo-content
+    app.kubernetes.io/managed-by: kustomize
+  name: datalogger-editor-role
+rules:
+- apiGroups:
+  - app.stackit.cloud
+  resources:
+  - dataloggers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - app.stackit.cloud
+  resources:
+  - dataloggers/status
+  verbs:
+  - get

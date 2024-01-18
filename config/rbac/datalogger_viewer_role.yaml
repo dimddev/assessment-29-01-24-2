@@ -1,0 +1,27 @@
+# permissions for end users to view dataloggers.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: datalogger-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: assessment-repo-content
+    app.kubernetes.io/part-of: assessment-repo-content
+    app.kubernetes.io/managed-by: kustomize
+  name: datalogger-viewer-role
+rules:
+- apiGroups:
+  - app.stackit.cloud
+  resources:
+  - dataloggers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - app.stackit.cloud
+  resources:
+  - dataloggers/status
+  verbs:
+  - get

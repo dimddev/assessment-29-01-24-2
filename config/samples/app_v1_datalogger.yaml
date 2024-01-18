@@ -1,0 +1,13 @@
+apiVersion: app.stackit.cloud/v1
+kind: DataLogger
+metadata:
+  labels:
+    app.kubernetes.io/name: datalogger
+    app.kubernetes.io/instance: datalogger-sample
+    app.kubernetes.io/part-of: assessment-repo-content
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: assessment-repo-content
+  name: datalogger-sample
+spec:
+  replicas: 1
+  custom-name: datalogger-sample
