@@ -73,12 +73,6 @@ $ make run
 
 ### Create a DataLogger
 
-Start the operator:
-
-```bash
-$ make run
-```
-
 Before we proceed with the CRD deployment, we are going to need some namespaces:
 
 ```bash

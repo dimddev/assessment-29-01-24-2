@@ -9,6 +9,8 @@ metadata:
     app.kubernetes.io/created-by: assessment-repo-content
   name: datalogger-sample-0001
   namespace: "my-namespace2"
+  finalizers:
+    - finalizer.stackit.cloud/datalogger
 spec:
   replicas: 1
   custom-name: datalogger-0001
