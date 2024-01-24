@@ -6,6 +6,8 @@ metadata:
     controller-gen.kubebuilder.io/version: v0.11.1
   creationTimestamp: null
   name: dataloggers.app.stackit.cloud
+  finalizers:
+    - finalizer.stackit.cloud/datalogger
 spec:
   group: app.stackit.cloud
   names:
@@ -37,6 +39,9 @@ spec:
             properties:
               custom-name:
                 type: string
+              port:
+                format: int32
+                type: integer
               replicas:
                 format: int32
                 type: integer

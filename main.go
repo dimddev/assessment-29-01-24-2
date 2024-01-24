@@ -19,17 +19,26 @@ package main
 import (
 	"flag"
 	"os"
+	"path/filepath"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	"stackit.cloud/datalogger/pkg/datalogger"
+	"stackit.cloud/datalogger/pkg/deployment"
+	"stackit.cloud/datalogger/pkg/namespace"
+	"stackit.cloud/datalogger/pkg/service"
+
 	appv1 "stackit.cloud/datalogger/api/v1"
 	"stackit.cloud/datalogger/controllers"
-	//+kubebuilder:scaffold:imports
+	// +kubebuilder:scaffold:imports
 )
 
 var (
@@ -41,14 +50,24 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(appv1.AddToScheme(scheme))
-	//+kubebuilder:scaffold:scheme
+	// +kubebuilder:scaffold:scheme
+}
+
+// CustomOptions extends ctrl.Options with MetricsBindAddress and Port
+type CustomOptions struct {
+	ctrl.Options
+
+	MetricsBindAddress string
+	Port               int
 }
 
 func main() {
-	var metricsAddr string
+	var customOpts CustomOptions
 	var enableLeaderElection bool
 	var probeAddr string
-	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
+
+	flag.StringVar(&customOpts.MetricsBindAddress, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
+	flag.IntVar(&customOpts.Port, "port", 9443, "The port the controller manager serves on.")
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
@@ -61,38 +80,57 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	customOpts.Options = ctrl.Options{
 		Scheme:                 scheme,
-		MetricsBindAddress:     metricsAddr,
-		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
 		LeaderElectionID:       "dfc9ea2a.stackit.cloud",
-		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
-		// when the Manager ends. This requires the binary to immediately end when the
-		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
-		// speeds up voluntary leader transitions as the new leader don't have to wait
-		// LeaseDuration time first.
-		//
-		// In the default scaffold provided, the program ends immediately after
-		// the manager stops, so would be fine to enable this option. However,
-		// if you are doing or is intended to do any operation such as perform cleanups
-		// after the manager stops then its usage might be unsafe.
-		// LeaderElectionReleaseOnCancel: true,
-	})
+	}
+
+	// Load kubeconfig from the specified path or the default path
+	kubeconfigPath := os.Getenv("KUBECONFIG")
+	if kubeconfigPath == "" {
+		kubeconfigPath = filepath.Join(os.Getenv("HOME"), ".kube", "config")
+	}
+
+	kubeconfig, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
+	if err != nil {
+		setupLog.Error(err, "unable to load kubeconfig")
+		os.Exit(1)
+	}
+
+	mgr, err := ctrl.NewManager(kubeconfig, customOpts.Options)
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
 
-	if err = (&controllers.DataLoggerReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "DataLogger")
+	callBack := controllerutil.SetControllerReference
+
+	newDeployment := deployment.NewDeployment(callBack)
+
+	controllerByCallback := metav1.IsControlledBy
+	newService := service.NewService(controllerByCallback)
+
+	dataLoggerReconciler := datalogger.NewReconciler(mgr.GetClient(), newDeployment, newService)
+
+	err = controllers.NewDataLoggerReconciler(
+		mgr.GetClient(), dataLoggerReconciler, mgr.GetScheme()).SetupWithManager(mgr)
+
+	if err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "dataLogger")
 		os.Exit(1)
 	}
-	//+kubebuilder:scaffold:builder
+
+	namespaceOperator := namespace.NewNamespaceReconciler(setupLog)
+
+	err = controllers.NewNamespaceReconciler(mgr.GetClient(), mgr.GetScheme(), namespaceOperator).SetupWithManager(mgr)
+	if err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "Namespace")
+		os.Exit(1)
+	}
+
+	// +kubebuilder:scaffold:builder
 
 	if err := mgr.AddHealthzCheck("healthz", healthz.Ping); err != nil {
 		setupLog.Error(err, "unable to set up health check")

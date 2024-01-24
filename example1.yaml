@@ -2,16 +2,14 @@ apiVersion: app.stackit.cloud/v1
 kind: DataLogger
 metadata:
   labels:
-    app.kubernetes.io/name: datalogger
+    app.kubernetes.io/name: datalogger42
     app.kubernetes.io/instance: datalogger-sample
     app.kubernetes.io/part-of: assessment-repo-content
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/created-by: assessment-repo-content
-  name: datalogger-sample
-  namespace: "my-namespace1"
-  finalizers:
-    - finalizer.stackit.cloud/datalogger
+  name: datalogger-sample-0001
+  namespace: "my-namespace2"
 spec:
   replicas: 1
-  custom-name: datalogger-sample
-  port: 32001
+  custom-name: datalogger-0001
+  port: 32200

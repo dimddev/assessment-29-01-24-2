@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cr-default-ns
+  labels:
+    namespaces1: my-namespace1
+    namespaces2: my-namespace2
+    namespaces3: my-namespace3
+    namespaces4: my-namespace4
+    namespaces5: my-namespace5

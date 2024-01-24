@@ -59,7 +59,7 @@ vet: ## Run go vet against code.
 
 .PHONY: test
 test: fmt vet tparse ## Run tests.
-	go test ./... -coverprofile cover.out -json | $(TPARSE) -all
+	go clean -testcache && go test -race ./... -coverprofile cover.out -json | $(TPARSE) -all
 
 ##@ Build
 

@@ -17,6 +17,7 @@ limitations under the License.
 package v1
 
 import (
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -30,6 +31,7 @@ type DataLoggerSpec struct {
 
 	CustomName string `json:"custom-name"`
 	Replicas   int32  `json:"replicas,omitempty"`
+	Port       int32  `json:"port,omitempty"`
 }
 
 // DataLoggerStatus defines the observed state of DataLogger
@@ -38,19 +40,67 @@ type DataLoggerStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-//+kubebuilder:object:root=true
-//+kubebuilder:subresource:status
+type MetaDataLogger struct {
+	metav1.TypeMeta `json:",inline"`
+	Finalizers      []string `json:"finalizers,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // DataLogger is the Schema for the dataloggers API
 type DataLogger struct {
-	metav1.TypeMeta   `json:",inline"`
+	MetaDataLogger
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	Spec   DataLoggerSpec   `json:"spec,omitempty"`
 	Status DataLoggerStatus `json:"status,omitempty"`
 }
 
-//+kubebuilder:object:root=true
+// SetResourceVersion sets the resource version for the object
+func (d *DataLogger) SetResourceVersion(version string) {
+	d.ObjectMeta.ResourceVersion = version
+}
+
+// GetGenerateName returns the value of the generateName field
+func (d *DataLogger) GetGenerateName() string {
+	return d.ObjectMeta.GenerateName
+}
+
+func (d *DataLogger) GetCreationTimestamp() v1.Time {
+	return d.ObjectMeta.CreationTimestamp
+}
+
+// GetLabels returns a copy of the labels associated with the object
+func (d *DataLogger) GetLabels() map[string]string {
+	if d.ObjectMeta.Labels == nil {
+		return nil
+	}
+
+	labelsCopy := make(map[string]string, len(d.ObjectMeta.Labels))
+	for key, value := range d.ObjectMeta.Labels {
+		labelsCopy[key] = value
+	}
+
+	return labelsCopy
+}
+
+// GetNamespace returns the namespace of the object
+func (d *DataLogger) GetNamespace() string {
+	return d.ObjectMeta.Namespace
+}
+
+// SetNamespace sets the namespace of the object
+func (d *DataLogger) SetNamespace(namespace string) {
+	d.ObjectMeta.Namespace = namespace
+}
+
+// GetName returns the name of the object
+func (d *DataLogger) GetName() string {
+	return d.ObjectMeta.Name
+}
+
+// +kubebuilder:object:root=true
 
 // DataLoggerList contains a list of DataLogger
 type DataLoggerList struct {
