@@ -23,8 +23,8 @@ func NewNamespaceReconciler(logger pkg.LogOperator) *Namespace {
 
 func (n Namespace) Reconcile(ctx context.Context, req ctrl.Request, apiClient pkg.ApiClientOperator) error {
 	namespace := &corev1.Namespace{}
-	err := apiClient.Get(ctx, req.NamespacedName, namespace)
 
+	err := apiClient.Get(ctx, req.NamespacedName, namespace)
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			n.logger.Error(err, "unable to fetch dataLogger CRD namespace", req.Name, req.Namespace)

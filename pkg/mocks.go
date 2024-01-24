@@ -294,3 +294,40 @@ func (mr *MockServiceOperatorMockRecorder) Reconcile(ctx, req, r interface{}) *g
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reconcile", reflect.TypeOf((*MockServiceOperator)(nil).Reconcile), ctx, req, r)
 }
+
+// MockNamespaceOperator is a mock of NamespaceOperator interface.
+type MockNamespaceOperator struct {
+	ctrl     *gomock.Controller
+	recorder *MockNamespaceOperatorMockRecorder
+}
+
+// MockNamespaceOperatorMockRecorder is the mock recorder for MockNamespaceOperator.
+type MockNamespaceOperatorMockRecorder struct {
+	mock *MockNamespaceOperator
+}
+
+// NewMockNamespaceOperator creates a new mock instance.
+func NewMockNamespaceOperator(ctrl *gomock.Controller) *MockNamespaceOperator {
+	mock := &MockNamespaceOperator{ctrl: ctrl}
+	mock.recorder = &MockNamespaceOperatorMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockNamespaceOperator) EXPECT() *MockNamespaceOperatorMockRecorder {
+	return m.recorder
+}
+
+// Reconcile mocks base method.
+func (m *MockNamespaceOperator) Reconcile(ctx context.Context, req reconcile.Request, r ApiClientOperator) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Reconcile", ctx, req, r)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Reconcile indicates an expected call of Reconcile.
+func (mr *MockNamespaceOperatorMockRecorder) Reconcile(ctx, req, r interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reconcile", reflect.TypeOf((*MockNamespaceOperator)(nil).Reconcile), ctx, req, r)
+}
