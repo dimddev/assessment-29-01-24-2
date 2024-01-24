@@ -88,10 +88,20 @@ We have an example DataLogger in this directory which can be applied to the clus
 $ kubectl apply -f example.yaml
 ```
 
+Access httpbin api ( change the ip address accordingly to your configuration ):
+
+```bash
+$ curl http://172.20.0.2:32101
+```
+
 Additionally we have on more CR for testing:
 
 ```bash
 $ kubectl apply -f example1.yaml
+```
+
+```bash
+$ curl http://172.20.0.2:32102
 ```
 
 ### Cleanup
@@ -104,6 +114,9 @@ $ kubectl delete -f example.yaml
 $ kubectl delete -f example1.yaml
 ```
 
+```bash
+$ kubectl delete -f namespaces.yaml
+```
 
 ### Run the tests
 
