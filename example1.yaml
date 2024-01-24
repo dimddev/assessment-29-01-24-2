@@ -2,7 +2,7 @@ apiVersion: app.stackit.cloud/v1
 kind: DataLogger
 metadata:
   labels:
-    app.kubernetes.io/name: datalogger42
+    app.kubernetes.io/name: datalogger-0001
     app.kubernetes.io/instance: datalogger-sample
     app.kubernetes.io/part-of: assessment-repo-content
     app.kubernetes.io/managed-by: kustomize
@@ -14,4 +14,4 @@ spec:
   custom-name: datalogger-0001
   port: 8080
   target-port: 80
-  node-port: 32101
+  node-port: 32102
