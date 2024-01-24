@@ -17,13 +17,17 @@ import (
 
 // NamespaceReconciler reconciles a Namespace object
 type NamespaceReconciler struct {
-	client pkg.ApiClientOperator
-	ns     pkg.NamespaceOperator
-	scheme *runtime.Scheme
+	apiClient pkg.APIClientOperator
+	ns        pkg.NamespaceOperator
+	scheme    *runtime.Scheme
 }
 
-func NewNamespaceReconciler(client pkg.ApiClientOperator, scheme *runtime.Scheme, ns pkg.NamespaceOperator) *NamespaceReconciler {
-	return &NamespaceReconciler{client: client, scheme: scheme, ns: ns}
+func NewNamespaceReconciler(
+	apiClient pkg.APIClientOperator,
+	scheme *runtime.Scheme,
+	ns pkg.NamespaceOperator,
+) *NamespaceReconciler {
+	return &NamespaceReconciler{apiClient: apiClient, scheme: scheme, ns: ns}
 }
 
 // +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch;create;update;patch;delete
@@ -31,14 +35,15 @@ func NewNamespaceReconciler(client pkg.ApiClientOperator, scheme *runtime.Scheme
 func (r *NamespaceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
 
-	err := r.ns.Reconcile(ctx, req, r.client)
+	err := r.ns.Reconcile(ctx, req, r.apiClient)
 	if err != nil {
 		if !errors.IsNotFound(err) {
 			logger.Error(err, "unable to fetch dataLogger CRD namespace", req.Name, req.Namespace)
 		}
+
 		return ctrl.Result{
 			Requeue:      true,
-			RequeueAfter: 30 * time.Second,
+			RequeueAfter: RequeueTime * time.Second,
 		}, client.IgnoreNotFound(err)
 	}
 

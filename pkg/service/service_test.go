@@ -316,9 +316,9 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 					},
 					Ports: []corev1.ServicePort{
 						{
-							Port:       8080,
-							TargetPort: intstr.FromInt32(80),
-							NodePort:   dataLogger.Spec.Port,
+							Port:       dataLogger.Spec.Port,
+							TargetPort: intstr.FromInt32(dataLogger.Spec.TargetPort),
+							NodePort:   dataLogger.Spec.NodePort,
 						},
 					},
 					Type: corev1.ServiceTypeNodePort, // Set the Service Type to NodePort

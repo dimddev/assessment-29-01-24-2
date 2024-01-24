@@ -14,4 +14,6 @@ metadata:
 spec:
   replicas: 1
   custom-name: datalogger-sample
-  port: 32001
+  port: 8080
+  node-port: 32101
+  target-port: 80

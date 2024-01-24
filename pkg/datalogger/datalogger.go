@@ -18,17 +18,17 @@ import (
 const ClusterFinalizer = "finalizer.stackit.cloud/datalogger"
 
 type Reconciler struct {
-	client     pkg.ApiClientOperator
+	apiClient  pkg.APIClientOperator
 	deployment pkg.DeploymentOperator
 	service    pkg.ServiceOperator
 }
 
 func NewReconciler(
-	client pkg.ApiClientOperator,
+	apiClient pkg.APIClientOperator,
 	deployment pkg.DeploymentOperator,
 	service pkg.ServiceOperator,
 ) *Reconciler {
-	return &Reconciler{client: client, deployment: deployment, service: service}
+	return &Reconciler{apiClient: apiClient, deployment: deployment, service: service}
 }
 
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request, dataLogger *appv1.DataLogger) error {
@@ -45,12 +45,12 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request, dataLogger
 		return nil
 	}
 
-	err := r.deployment.Reconcile(ctx, req, r.client)
+	err := r.deployment.Reconcile(ctx, req, r.apiClient)
 	if err != nil {
 		return err
 	}
 
-	err = r.service.Reconcile(ctx, req, r.client)
+	err = r.service.Reconcile(ctx, req, r.apiClient)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func (r *Reconciler) Finalize(ctx context.Context, dataLogger *appv1.DataLogger,
 		return err
 	}
 
-	if err = r.client.Update(ctx, dataLogger); err != nil {
+	if err = r.apiClient.Update(ctx, dataLogger); err != nil {
 		logger.Error(
 			err,
 			"unable to update dataLogger CR instance",
@@ -92,11 +92,11 @@ func (r *Reconciler) Finalize(ctx context.Context, dataLogger *appv1.DataLogger,
 func (r *Reconciler) DeleteResource(
 	ctx context.Context,
 	obj client.Object,
-	log pkg.LogOperator,
+	logger pkg.LogOperator,
 ) error {
-	err := r.client.Delete(ctx, obj)
+	err := r.apiClient.Delete(ctx, obj)
 	if err != nil {
-		log.Error(
+		logger.Error(
 			err,
 			"unable to delete dataLogger CD instance",
 			obj.GetName(), obj.GetNamespace(),
@@ -106,7 +106,7 @@ func (r *Reconciler) DeleteResource(
 		return err
 	}
 
-	log.Info("Resource was deleted successfully", obj.GetName(), obj.GetNamespace())
+	logger.Info("Resource was deleted successfully", obj.GetName(), obj.GetNamespace())
 
 	return nil
 }
@@ -116,19 +116,19 @@ func (r *Reconciler) GetResource(
 	obj client.Object,
 	name string,
 	namespace string,
-	log pkg.LogOperator,
+	logger pkg.LogOperator,
 ) error {
-
-	err := r.client.Get(ctx, client.ObjectKey{Name: namespace}, obj)
+	err := r.apiClient.Get(ctx, client.ObjectKey{Name: namespace}, obj)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			log.Error(
+			logger.Error(
 				err,
 				"unable to fetch dataLogger CR instance",
 				name,
 				namespace,
 			)
 		}
+
 		return err
 	}
 

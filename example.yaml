@@ -13,5 +13,7 @@ metadata:
     - finalizer.stackit.cloud/datalogger
 spec:
   replicas: 1
-  custom-name: datalogger-420
-  port: 32101
+  custom-name: datalogger-42
+  port: 8080
+  target-port: 80
+  node-port: 32101

@@ -14,6 +14,9 @@ import (
 	"stackit.cloud/datalogger/pkg"
 )
 
+const labelName = "app.kubernetes.io/name"
+const labelInstance = "app.kubernetes.io/instance"
+
 type OwnerCallback func(owner metav1.Object, controlled metav1.Object, scheme *runtime.Scheme) error
 
 type Deployment struct {
@@ -24,7 +27,7 @@ func NewDeployment(ownerCallback OwnerCallback) *Deployment {
 	return &Deployment{ownerCallback: ownerCallback}
 }
 
-func (d Deployment) Reconcile(ctx context.Context, req ctrl.Request, r pkg.ApiClientOperator) error {
+func (d Deployment) Reconcile(ctx context.Context, req ctrl.Request, r pkg.APIClientOperator) error {
 	dataLogger := &appv1.DataLogger{}
 	if err := r.Get(ctx, req.NamespacedName, dataLogger); err != nil {
 		return err
@@ -48,7 +51,7 @@ func (d Deployment) Reconcile(ctx context.Context, req ctrl.Request, r pkg.ApiCl
 }
 
 // CreateOrUpdate creates the resource if it doesn't exist, or updates it if it does.
-func (d Deployment) CreateOrUpdate(ctx context.Context, obj *appsv1.Deployment, r pkg.ApiClientOperator) error {
+func (Deployment) CreateOrUpdate(ctx context.Context, obj *appsv1.Deployment, r pkg.APIClientOperator) error {
 	logger := log.FromContext(ctx)
 
 	err := r.Get(ctx, client.ObjectKey{Namespace: obj.GetNamespace(), Name: obj.GetName()}, obj)
@@ -80,17 +83,17 @@ func (d Deployment) CreateOrUpdate(ctx context.Context, obj *appsv1.Deployment, 
 	return nil
 }
 
-func (d Deployment) CreateDeployment(dataLogger *appv1.DataLogger) *appsv1.Deployment {
+func (Deployment) CreateDeployment(dataLogger *appv1.DataLogger) *appsv1.Deployment {
 	labels := map[string]string{
-		"app.kubernetes.io/name":     dataLogger.ObjectMeta.Labels["app.kubernetes.io/name"],
-		"app.kubernetes.io/instance": dataLogger.ObjectMeta.Labels["app.kubernetes.io/instance"],
-		"app":                        dataLogger.Spec.CustomName,
+		labelName:     dataLogger.ObjectMeta.Labels[labelName],
+		labelInstance: dataLogger.ObjectMeta.Labels[labelInstance],
+		"app":         dataLogger.Spec.CustomName,
 	}
 
 	selectorLabels := map[string]string{
-		"app.kubernetes.io/name":     dataLogger.ObjectMeta.Labels["app.kubernetes.io/name"],
-		"app.kubernetes.io/instance": dataLogger.ObjectMeta.Labels["app.kubernetes.io/instance"],
-		"app":                        dataLogger.Spec.CustomName,
+		labelName:     dataLogger.ObjectMeta.Labels[labelName],
+		labelInstance: dataLogger.ObjectMeta.Labels[labelInstance],
+		"app":         dataLogger.Spec.CustomName,
 	}
 
 	// Reconciliation logic: Create or update Deployment
@@ -121,7 +124,7 @@ func (d Deployment) CreateDeployment(dataLogger *appv1.DataLogger) *appsv1.Deplo
 							},
 							Ports: []corev1.ContainerPort{
 								{
-									ContainerPort: 8080,
+									ContainerPort: dataLogger.Spec.Port,
 								},
 							},
 						},

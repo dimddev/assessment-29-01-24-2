@@ -14,7 +14,7 @@ import (
 	reconcile "sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-// MockApiClientOperator is a mock of ApiClientOperator interface.
+// MockApiClientOperator is a mock of APIClientOperator interface.
 type MockApiClientOperator struct {
 	ctrl     *gomock.Controller
 	recorder *MockApiClientOperatorMockRecorder
@@ -208,7 +208,7 @@ func (m *MockReconcileOperator) EXPECT() *MockReconcileOperatorMockRecorder {
 }
 
 // Reconcile mocks base method.
-func (m *MockReconcileOperator) Reconcile(ctx context.Context, req reconcile.Request, r ApiClientOperator) error {
+func (m *MockReconcileOperator) Reconcile(ctx context.Context, req reconcile.Request, r APIClientOperator) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Reconcile", ctx, req, r)
 	ret0, _ := ret[0].(error)
@@ -245,7 +245,7 @@ func (m *MockDeploymentOperator) EXPECT() *MockDeploymentOperatorMockRecorder {
 }
 
 // Reconcile mocks base method.
-func (m *MockDeploymentOperator) Reconcile(ctx context.Context, req reconcile.Request, r ApiClientOperator) error {
+func (m *MockDeploymentOperator) Reconcile(ctx context.Context, req reconcile.Request, r APIClientOperator) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Reconcile", ctx, req, r)
 	ret0, _ := ret[0].(error)
@@ -282,7 +282,7 @@ func (m *MockServiceOperator) EXPECT() *MockServiceOperatorMockRecorder {
 }
 
 // Reconcile mocks base method.
-func (m *MockServiceOperator) Reconcile(ctx context.Context, req reconcile.Request, r ApiClientOperator) error {
+func (m *MockServiceOperator) Reconcile(ctx context.Context, req reconcile.Request, r APIClientOperator) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Reconcile", ctx, req, r)
 	ret0, _ := ret[0].(error)
@@ -319,7 +319,7 @@ func (m *MockNamespaceOperator) EXPECT() *MockNamespaceOperatorMockRecorder {
 }
 
 // Reconcile mocks base method.
-func (m *MockNamespaceOperator) Reconcile(ctx context.Context, req reconcile.Request, r ApiClientOperator) error {
+func (m *MockNamespaceOperator) Reconcile(ctx context.Context, req reconcile.Request, r APIClientOperator) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Reconcile", ctx, req, r)
 	ret0, _ := ret[0].(error)

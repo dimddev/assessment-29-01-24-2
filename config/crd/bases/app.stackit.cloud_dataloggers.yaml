@@ -42,6 +42,12 @@ spec:
               port:
                 format: int32
                 type: integer
+              target-port:
+                format: int32
+                type: integer
+              node-port:
+                format: int32
+                type: integer
               replicas:
                 format: int32
                 type: integer

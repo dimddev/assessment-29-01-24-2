@@ -34,17 +34,17 @@ import (
 
 // DataLoggerReconciler reconciles a dataLogger object
 type DataLoggerReconciler struct {
-	client   pkg.ApiClientOperator
-	operator DataLoggerReconcileOperator
-	scheme   *runtime.Scheme
+	apiClient pkg.APIClientOperator
+	operator  DataLoggerReconcileOperator
+	scheme    *runtime.Scheme
 }
 
 func NewDataLoggerReconciler(
-	client pkg.ApiClientOperator,
+	apiClient pkg.APIClientOperator,
 	operator DataLoggerReconcileOperator,
 	scheme *runtime.Scheme,
 ) *DataLoggerReconciler {
-	return &DataLoggerReconciler{client: client, scheme: scheme, operator: operator}
+	return &DataLoggerReconciler{apiClient: apiClient, scheme: scheme, operator: operator}
 }
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -57,7 +57,7 @@ func (r *DataLoggerReconciler) Reconcile(
 
 	dataLogger := &appv1.DataLogger{}
 
-	err := r.client.Get(
+	err := r.apiClient.Get(
 		ctx,
 		client.ObjectKey{Name: req.NamespacedName.Name, Namespace: req.NamespacedName.Namespace},
 		dataLogger,
@@ -67,18 +67,20 @@ func (r *DataLoggerReconciler) Reconcile(
 		if !errors.IsNotFound(err) {
 			logger.Error(err, "unable to fetch dataLogger CRD", "datalogger controller", req.Namespace)
 		}
+
 		return ctrl.Result{
 			Requeue:      true,
-			RequeueAfter: 30 * time.Second,
+			RequeueAfter: RequeueTime * time.Second,
 		}, client.IgnoreNotFound(err)
 	}
 
 	err = r.operator.Reconcile(ctx, req, dataLogger)
 	if err != nil {
 		logger.Error(err, "unable to reconcile dataLogger CRD", "namespace", req.Namespace)
+
 		return ctrl.Result{
 			Requeue:      true,
-			RequeueAfter: 30 * time.Second,
+			RequeueAfter: RequeueTime * time.Second,
 		}, err
 	}
 

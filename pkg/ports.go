@@ -8,7 +8,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-type ApiClientOperator interface {
+type APIClientOperator interface {
 	Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error
 	Scheme() *runtime.Scheme
 	Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error
@@ -22,7 +22,7 @@ type LogOperator interface {
 }
 
 type ReconcileOperator interface {
-	Reconcile(ctx context.Context, req reconcile.Request, r ApiClientOperator) error
+	Reconcile(ctx context.Context, req reconcile.Request, r APIClientOperator) error
 }
 
 type DeploymentOperator interface {

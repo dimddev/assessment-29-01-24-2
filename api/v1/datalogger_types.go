@@ -32,6 +32,8 @@ type DataLoggerSpec struct {
 	CustomName string `json:"custom-name"`
 	Replicas   int32  `json:"replicas,omitempty"`
 	Port       int32  `json:"port,omitempty"`
+	NodePort   int32  `json:"node-port,omitempty"`
+	TargetPort int32  `json:"target-port,omitempty"`
 }
 
 // DataLoggerStatus defines the observed state of DataLogger

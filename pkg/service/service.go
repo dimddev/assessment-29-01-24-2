@@ -26,7 +26,7 @@ func NewService(controllerBy ControllerBy) *Service {
 	return &Service{controllerBy: controllerBy}
 }
 
-func (s Service) Reconcile(ctx context.Context, req ctrl.Request, r pkg.ApiClientOperator) error {
+func (s Service) Reconcile(ctx context.Context, req ctrl.Request, r pkg.APIClientOperator) error {
 	logger := log.FromContext(ctx)
 
 	dataLogger := &appv1.DataLogger{}
@@ -52,10 +52,14 @@ func (s Service) Reconcile(ctx context.Context, req ctrl.Request, r pkg.ApiClien
 	// Fetch or create the corresponding Service
 	service := &corev1.Service{}
 
-	err = r.Get(ctx, client.ObjectKey{Name: dataLogger.Spec.CustomName, Namespace: dataLogger.ObjectMeta.Namespace}, service)
+	err = r.Get(ctx, client.ObjectKey{
+		Name:      dataLogger.Spec.CustomName,
+		Namespace: dataLogger.ObjectMeta.Namespace,
+	}, service)
 	if err != nil {
 		// Service not found, create a new one
 		service = s.NewServiceForDataLogger(dataLogger)
+
 		err = r.Create(ctx, service)
 		if err != nil {
 			return err
@@ -68,7 +72,6 @@ func (s Service) Reconcile(ctx context.Context, req ctrl.Request, r pkg.ApiClien
 
 	// Reconcile the Service's selector to match the Deployment's Pods
 	if !s.controllerBy(service, deployment) {
-
 		service = s.UpdateService(service, deployment, dataLogger)
 
 		err = r.Update(ctx, service)
@@ -102,9 +105,9 @@ func (Service) UpdateService(svc *corev1.Service, dep *appsv1.Deployment, dLog *
 		},
 		Ports: []corev1.ServicePort{
 			{
-				Port:       8080,
-				TargetPort: intstr.FromInt32(80),
-				NodePort:   dLog.Spec.Port,
+				Port:       dLog.Spec.Port,
+				TargetPort: intstr.FromInt32(dLog.Spec.TargetPort),
+				NodePort:   dLog.Spec.NodePort,
 			},
 		},
 		Type: corev1.ServiceTypeNodePort, // Set the Service Type to NodePort
@@ -132,9 +135,9 @@ func (Service) NewServiceForDataLogger(dataLogger *appv1.DataLogger) *corev1.Ser
 			Selector: labels,
 			Ports: []corev1.ServicePort{
 				{
-					Port:       8080,
-					TargetPort: intstr.FromInt32(80),
-					NodePort:   dataLogger.Spec.Port,
+					Port:       dataLogger.Spec.Port,
+					TargetPort: intstr.FromInt32(dataLogger.Spec.TargetPort),
+					NodePort:   dataLogger.Spec.NodePort,
 				},
 			},
 			Type: corev1.ServiceTypeNodePort, // Set the Service Type to NodePort

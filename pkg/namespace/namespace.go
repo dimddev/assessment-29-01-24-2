@@ -21,7 +21,7 @@ func NewNamespaceReconciler(logger pkg.LogOperator) *Namespace {
 	return &Namespace{logger: logger}
 }
 
-func (n Namespace) Reconcile(ctx context.Context, req ctrl.Request, apiClient pkg.ApiClientOperator) error {
+func (n Namespace) Reconcile(ctx context.Context, req ctrl.Request, apiClient pkg.APIClientOperator) error {
 	namespace := &corev1.Namespace{}
 
 	err := apiClient.Get(ctx, req.NamespacedName, namespace)
@@ -43,7 +43,7 @@ func (n Namespace) Reconcile(ctx context.Context, req ctrl.Request, apiClient pk
 	return err
 }
 
-func (Namespace) createNamespaces(ctx context.Context, labels map[string]string, r pkg.ApiClientOperator) error {
+func (Namespace) createNamespaces(ctx context.Context, labels map[string]string, r pkg.APIClientOperator) error {
 	logger := log.FromContext(ctx)
 
 	for key, value := range labels {
@@ -53,6 +53,7 @@ func (Namespace) createNamespaces(ctx context.Context, labels map[string]string,
 
 			// Check if the namespace already exists
 			existingNamespace := &corev1.Namespace{}
+
 			err := r.Get(ctx, client.ObjectKey{Name: namespaceName}, existingNamespace)
 			if err != nil && errors.IsNotFound(err) {
 				// Namespace does not exist, create it
@@ -75,5 +76,6 @@ func (Namespace) createNamespaces(ctx context.Context, labels map[string]string,
 			}
 		}
 	}
+
 	return nil
 }
