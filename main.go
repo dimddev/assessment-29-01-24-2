@@ -21,15 +21,14 @@ import (
 	"os"
 	"path/filepath"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/clientcmd"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"stackit.cloud/datalogger/internal"
 
 	"stackit.cloud/datalogger/pkg/datalogger"
 	"stackit.cloud/datalogger/pkg/deployment"
@@ -105,12 +104,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	callBack := controllerutil.SetControllerReference
+	deploymentReference := internal.NewDeploymentReference()
 
-	newDeployment := deployment.NewDeployment(callBack)
+	newDeployment := deployment.NewDeployment(deploymentReference)
 
-	controllerByCallback := metav1.IsControlledBy
-	newService := service.NewService(controllerByCallback)
+	serviceReference := internal.NewServiceReference()
+
+	newService := service.NewService(serviceReference)
 
 	dataLoggerReconciler := datalogger.NewReconciler(mgr.GetClient(), newDeployment, newService)
 

@@ -23,7 +23,7 @@ func TestNamespaceControllerWithNoErrors(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 
 	operator := pkg.NewMockNamespaceOperator(mockCtrl)
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 
 	schema := &runtime.Scheme{}
 
@@ -79,7 +79,7 @@ func TestNamespaceControllerWithErrors(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 
 	operator := pkg.NewMockNamespaceOperator(mockCtrl)
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 
 	schema := &runtime.Scheme{}
 

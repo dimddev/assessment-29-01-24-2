@@ -16,14 +16,12 @@ import (
 	"stackit.cloud/datalogger/pkg"
 )
 
-type ControllerBy func(obj metav1.Object, owner metav1.Object) bool
-
 type Service struct {
-	controllerBy ControllerBy
+	reference pkg.ServiceReferenceController
 }
 
-func NewService(controllerBy ControllerBy) *Service {
-	return &Service{controllerBy: controllerBy}
+func NewService(reference pkg.ServiceReferenceController) *Service {
+	return &Service{reference: reference}
 }
 
 func (s Service) Reconcile(ctx context.Context, req ctrl.Request, r pkg.APIClientOperator) error {
@@ -71,7 +69,7 @@ func (s Service) Reconcile(ctx context.Context, req ctrl.Request, r pkg.APIClien
 	}
 
 	// Reconcile the Service's selector to match the Deployment's Pods
-	if !s.controllerBy(service, deployment) {
+	if !s.reference.IsControlledBy(service, deployment) {
 		service = s.UpdateService(service, deployment, dataLogger)
 
 		err = r.Update(ctx, service)

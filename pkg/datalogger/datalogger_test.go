@@ -24,7 +24,7 @@ func TestDataLoggerReconcilerFinalizerWithNoErrors(t *testing.T) {
 
 	mockCtrl := gomock.NewController(t)
 
-	mockedApiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	mockedApiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 
 	mockedDeployment := pkg.NewMockDeploymentOperator(mockCtrl)
 	mockedService := pkg.NewMockServiceOperator(mockCtrl)
@@ -105,7 +105,7 @@ func TestDataLoggerReconcilerFinalizerWithErrors(t *testing.T) {
 
 	mockCtrl := gomock.NewController(t)
 
-	mockedApiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	mockedApiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 
 	mockedDeployment := pkg.NewMockDeploymentOperator(mockCtrl)
 	mockedService := pkg.NewMockServiceOperator(mockCtrl)

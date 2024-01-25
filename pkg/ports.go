@@ -3,6 +3,7 @@ package pkg
 import (
 	"context"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
@@ -35,4 +36,12 @@ type ServiceOperator interface {
 
 type NamespaceOperator interface {
 	ReconcileOperator
+}
+
+type DeploymentReferenceController interface {
+	SetControllerReference(owner, controlled metav1.Object, scheme *runtime.Scheme) error
+}
+
+type ServiceReferenceController interface {
+	IsControlledBy(obj metav1.Object, owner metav1.Object) bool
 }

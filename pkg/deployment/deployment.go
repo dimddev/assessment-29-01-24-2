@@ -6,7 +6,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -17,14 +16,12 @@ import (
 const labelName = "app.kubernetes.io/name"
 const labelInstance = "app.kubernetes.io/instance"
 
-type OwnerCallback func(owner metav1.Object, controlled metav1.Object, scheme *runtime.Scheme) error
-
 type Deployment struct {
-	ownerCallback OwnerCallback
+	reference pkg.DeploymentReferenceController
 }
 
-func NewDeployment(ownerCallback OwnerCallback) *Deployment {
-	return &Deployment{ownerCallback: ownerCallback}
+func NewDeployment(reference pkg.DeploymentReferenceController) *Deployment {
+	return &Deployment{reference: reference}
 }
 
 func (d Deployment) Reconcile(ctx context.Context, req ctrl.Request, r pkg.APIClientOperator) error {
@@ -36,7 +33,7 @@ func (d Deployment) Reconcile(ctx context.Context, req ctrl.Request, r pkg.APICl
 	deployment := d.CreateDeployment(dataLogger)
 
 	// Set owner reference to the dataLogger instance
-	err := d.ownerCallback(dataLogger, deployment, r.Scheme())
+	err := d.reference.SetControllerReference(dataLogger, deployment, r.Scheme())
 	if err != nil {
 		return err
 	}

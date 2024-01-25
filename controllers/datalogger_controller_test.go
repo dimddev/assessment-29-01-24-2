@@ -26,7 +26,7 @@ func TestDataLoggerControllerWithNoErrors(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 
 	operator := mock.NewMockDataLoggerReconcileOperator(mockCtrl)
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 
 	schema := &runtime.Scheme{}
 
@@ -88,7 +88,7 @@ func TestDataLoggerControllerWithErrors(t *testing.T) {
 	mockCtrl := gomock.NewController(t)
 
 	operator := mock.NewMockDataLoggerReconcileOperator(mockCtrl)
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 
 	schema := &runtime.Scheme{}
 

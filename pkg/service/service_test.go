@@ -28,13 +28,11 @@ func TestServiceReconcileWithNoErrors(t *testing.T) {
 
 	mockCtrl := gomock.NewController(t)
 
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 
-	controlledByTrue := func(obj metav1.Object, owner metav1.Object) bool {
-		return true
-	}
+	mockedReference := pkg.NewMockServiceReferenceController(mockCtrl)
 
-	reconciler := NewService(controlledByTrue)
+	reconciler := NewService(mockedReference)
 
 	tests := []struct {
 		name        string
@@ -89,6 +87,8 @@ func TestServiceReconcileWithNoErrors(t *testing.T) {
 			service := &corev1.Service{}
 			apiClient.EXPECT().Get(ctx, client.ObjectKey{Name: test.name, Namespace: test.namespace}, service).Times(1).Return(nil)
 
+			mockedReference.EXPECT().IsControlledBy(service, deployment).Times(1).Return(true)
+
 			err := reconciler.Reconcile(ctx, req, apiClient)
 			require.Nil(t, err)
 		})
@@ -100,55 +100,52 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 
 	mockCtrl := gomock.NewController(t)
 
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
+
+	mockedReference := pkg.NewMockServiceReferenceController(mockCtrl)
 
 	tests := []struct {
-		name         string
-		namespace    string
-		errorValue1  any
-		errorValue2  any
-		times        int
-		want         ctrl.Result
-		notFound     *errors2.StatusError
-		controlledBy func(obj metav1.Object, owner metav1.Object) bool
+		name        string
+		namespace   string
+		errorValue1 any
+		errorValue2 any
+		times       int
+		want        ctrl.Result
+		notFound    *errors2.StatusError
 	}{
 		{
-			name:         "DataLoggerController-1",
-			namespace:    "my-namespace1",
-			errorValue1:  errors.New("get error 1"),
-			errorValue2:  nil,
-			times:        1,
-			want:         ctrl.Result{Requeue: false},
-			controlledBy: func(obj metav1.Object, owner metav1.Object) bool { return true },
+			name:        "DataLoggerController-1",
+			namespace:   "my-namespace1",
+			errorValue1: errors.New("get error 1"),
+			errorValue2: nil,
+			times:       1,
+			want:        ctrl.Result{Requeue: false},
 		},
 		{
-			name:         "DataLoggerController-1.1",
-			namespace:    "my-namespace1",
-			errorValue1:  nil,
-			errorValue2:  nil,
-			times:        1,
-			want:         ctrl.Result{Requeue: false},
-			notFound:     errors2.NewNotFound(schema.GroupResource{Group: "", Resource: "resources"}, "resource-name"),
-			controlledBy: func(obj metav1.Object, owner metav1.Object) bool { return true },
+			name:        "DataLoggerController-1.1",
+			namespace:   "my-namespace1",
+			errorValue1: nil,
+			errorValue2: nil,
+			times:       1,
+			want:        ctrl.Result{Requeue: false},
+			notFound:    errors2.NewNotFound(schema.GroupResource{Group: "", Resource: "resources"}, "resource-name"),
 		},
 		{
-			name:         "DataLoggerController-2",
-			namespace:    "my-namespace2",
-			errorValue1:  nil,
-			errorValue2:  errors.New("get error 2"),
-			times:        1,
-			want:         ctrl.Result{Requeue: false},
-			controlledBy: func(obj metav1.Object, owner metav1.Object) bool { return true },
+			name:        "DataLoggerController-2",
+			namespace:   "my-namespace2",
+			errorValue1: nil,
+			errorValue2: errors.New("get error 2"),
+			times:       1,
+			want:        ctrl.Result{Requeue: false},
 		},
 		{
-			name:         "DataLoggerController-3",
-			namespace:    "my-namespace3",
-			errorValue1:  nil,
-			errorValue2:  nil,
-			times:        1,
-			want:         ctrl.Result{Requeue: false},
-			notFound:     nil,
-			controlledBy: func(obj metav1.Object, owner metav1.Object) bool { return false },
+			name:        "DataLoggerController-3",
+			namespace:   "my-namespace3",
+			errorValue1: nil,
+			errorValue2: nil,
+			times:       1,
+			want:        ctrl.Result{Requeue: false},
+			notFound:    nil,
 		},
 	}
 
@@ -158,7 +155,7 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 			t.Parallel()
 
 			if test.errorValue1 != nil && test.errorValue2 == nil {
-				reconciler := NewService(test.controlledBy)
+				reconciler := NewService(mockedReference)
 
 				reqType := types.NamespacedName{Namespace: test.namespace, Name: test.name}
 				req := reconcile.Request{NamespacedName: reqType}
@@ -173,10 +170,8 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 
 				err := reconciler.Reconcile(ctx, req, apiClient)
 				require.EqualValues(t, err.Error(), "get error 1")
-			}
-
-			if test.errorValue1 == nil && test.errorValue2 == nil && test.notFound != nil {
-				reconciler := NewService(test.controlledBy)
+			} else if test.errorValue1 == nil && test.errorValue2 == nil && test.notFound != nil {
+				reconciler := NewService(mockedReference)
 
 				reqType := types.NamespacedName{Namespace: test.namespace, Name: test.name}
 				req := reconcile.Request{NamespacedName: reqType}
@@ -193,10 +188,8 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 				require.Nil(t, err)
 
 				return
-			}
-
-			if test.errorValue1 == nil && test.errorValue2 != nil && test.notFound == nil {
-				reconciler := NewService(test.controlledBy)
+			} else if test.errorValue1 == nil && test.errorValue2 != nil && test.notFound == nil {
+				reconciler := NewService(mockedReference)
 
 				reqType := types.NamespacedName{Namespace: test.namespace, Name: test.name}
 				req := reconcile.Request{NamespacedName: reqType}
@@ -247,10 +240,8 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 				require.Nil(t, err)
 
 				return
-			}
-
-			if !test.controlledBy(&corev1.Service{}, &appsv1.Deployment{}) {
-				reconciler := NewService(test.controlledBy)
+			} else {
+				reconciler := NewService(mockedReference)
 
 				reqType := types.NamespacedName{Namespace: test.namespace, Name: test.name}
 				req := reconcile.Request{NamespacedName: reqType}
@@ -271,16 +262,16 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 
 				deployment := &appsv1.Deployment{}
 
+				labels := metav1.LabelSelector{
+					MatchLabels:      map[string]string{"app": test.name},
+					MatchExpressions: nil,
+				}
+
 				apiClient.EXPECT().Get(
 					ctx,
 					client.ObjectKey{Name: test.name, Namespace: test.namespace},
 					deployment, gomock.Any(),
 				).Times(1).Do(func(ctx context.Context, c client.ObjectKey, deps *appsv1.Deployment, opts ...interface{}) error {
-					labels := metav1.LabelSelector{
-						MatchLabels:      map[string]string{"app": test.name},
-						MatchExpressions: nil,
-					}
-
 					deps.Spec.Selector = &labels
 
 					return nil
@@ -298,10 +289,10 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 				svc := &corev1.Service{}
 
 				// labels := map[string]string{"app": test.name}
-				labels := map[string]string{"app": test.name}
+				metaLabels := map[string]string{"app": test.name}
 
 				// The Service is not controlled by the Deployment, update it
-				svc.ObjectMeta.Labels = labels
+				svc.ObjectMeta.Labels = metaLabels
 				svc.ObjectMeta.OwnerReferences = []metav1.OwnerReference{
 					*metav1.NewControllerRef(dep, schema.GroupVersionKind{
 						Group:   "apps",
@@ -324,8 +315,13 @@ func TestServiceReconcileWithErrors(t *testing.T) {
 					Type: corev1.ServiceTypeNodePort, // Set the Service Type to NodePort
 				}
 
+				dep1 := &appsv1.Deployment{}
+				dep1.Spec.Selector = &labels
+				mockedReference.EXPECT().IsControlledBy(service, dep1).Times(1).Return(false)
 				apiClient.EXPECT().Update(ctx, svc).Times(1).Return(nil)
+
 				err := reconciler.Reconcile(ctx, req, apiClient)
+
 				require.Nil(t, err)
 			}
 		})

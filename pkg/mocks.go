@@ -9,36 +9,37 @@ import (
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	client "sigs.k8s.io/controller-runtime/pkg/client"
 	reconcile "sigs.k8s.io/controller-runtime/pkg/reconcile"
 )
 
-// MockApiClientOperator is a mock of APIClientOperator interface.
-type MockApiClientOperator struct {
+// MockAPIClientOperator is a mock of APIClientOperator interface.
+type MockAPIClientOperator struct {
 	ctrl     *gomock.Controller
-	recorder *MockApiClientOperatorMockRecorder
+	recorder *MockAPIClientOperatorMockRecorder
 }
 
-// MockApiClientOperatorMockRecorder is the mock recorder for MockApiClientOperator.
-type MockApiClientOperatorMockRecorder struct {
-	mock *MockApiClientOperator
+// MockAPIClientOperatorMockRecorder is the mock recorder for MockAPIClientOperator.
+type MockAPIClientOperatorMockRecorder struct {
+	mock *MockAPIClientOperator
 }
 
-// NewMockApiClientOperator creates a new mock instance.
-func NewMockApiClientOperator(ctrl *gomock.Controller) *MockApiClientOperator {
-	mock := &MockApiClientOperator{ctrl: ctrl}
-	mock.recorder = &MockApiClientOperatorMockRecorder{mock}
+// NewMockAPIClientOperator creates a new mock instance.
+func NewMockAPIClientOperator(ctrl *gomock.Controller) *MockAPIClientOperator {
+	mock := &MockAPIClientOperator{ctrl: ctrl}
+	mock.recorder = &MockAPIClientOperatorMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockApiClientOperator) EXPECT() *MockApiClientOperatorMockRecorder {
+func (m *MockAPIClientOperator) EXPECT() *MockAPIClientOperatorMockRecorder {
 	return m.recorder
 }
 
 // Create mocks base method.
-func (m *MockApiClientOperator) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
+func (m *MockAPIClientOperator) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, obj}
 	for _, a := range opts {
@@ -50,14 +51,14 @@ func (m *MockApiClientOperator) Create(ctx context.Context, obj client.Object, o
 }
 
 // Create indicates an expected call of Create.
-func (mr *MockApiClientOperatorMockRecorder) Create(ctx, obj interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAPIClientOperatorMockRecorder) Create(ctx, obj interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, obj}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockApiClientOperator)(nil).Create), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockAPIClientOperator)(nil).Create), varargs...)
 }
 
 // Delete mocks base method.
-func (m *MockApiClientOperator) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
+func (m *MockAPIClientOperator) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, obj}
 	for _, a := range opts {
@@ -69,14 +70,14 @@ func (m *MockApiClientOperator) Delete(ctx context.Context, obj client.Object, o
 }
 
 // Delete indicates an expected call of Delete.
-func (mr *MockApiClientOperatorMockRecorder) Delete(ctx, obj interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAPIClientOperatorMockRecorder) Delete(ctx, obj interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, obj}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockApiClientOperator)(nil).Delete), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockAPIClientOperator)(nil).Delete), varargs...)
 }
 
 // Get mocks base method.
-func (m *MockApiClientOperator) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
+func (m *MockAPIClientOperator) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, key, obj}
 	for _, a := range opts {
@@ -88,14 +89,14 @@ func (m *MockApiClientOperator) Get(ctx context.Context, key client.ObjectKey, o
 }
 
 // Get indicates an expected call of Get.
-func (mr *MockApiClientOperatorMockRecorder) Get(ctx, key, obj interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAPIClientOperatorMockRecorder) Get(ctx, key, obj interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, key, obj}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockApiClientOperator)(nil).Get), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockAPIClientOperator)(nil).Get), varargs...)
 }
 
 // Scheme mocks base method.
-func (m *MockApiClientOperator) Scheme() *runtime.Scheme {
+func (m *MockAPIClientOperator) Scheme() *runtime.Scheme {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Scheme")
 	ret0, _ := ret[0].(*runtime.Scheme)
@@ -103,13 +104,13 @@ func (m *MockApiClientOperator) Scheme() *runtime.Scheme {
 }
 
 // Scheme indicates an expected call of Scheme.
-func (mr *MockApiClientOperatorMockRecorder) Scheme() *gomock.Call {
+func (mr *MockAPIClientOperatorMockRecorder) Scheme() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scheme", reflect.TypeOf((*MockApiClientOperator)(nil).Scheme))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Scheme", reflect.TypeOf((*MockAPIClientOperator)(nil).Scheme))
 }
 
 // Update mocks base method.
-func (m *MockApiClientOperator) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
+func (m *MockAPIClientOperator) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{ctx, obj}
 	for _, a := range opts {
@@ -121,10 +122,10 @@ func (m *MockApiClientOperator) Update(ctx context.Context, obj client.Object, o
 }
 
 // Update indicates an expected call of Update.
-func (mr *MockApiClientOperatorMockRecorder) Update(ctx, obj interface{}, opts ...interface{}) *gomock.Call {
+func (mr *MockAPIClientOperatorMockRecorder) Update(ctx, obj interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, obj}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockApiClientOperator)(nil).Update), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockAPIClientOperator)(nil).Update), varargs...)
 }
 
 // MockLogOperator is a mock of LogOperator interface.
@@ -330,4 +331,78 @@ func (m *MockNamespaceOperator) Reconcile(ctx context.Context, req reconcile.Req
 func (mr *MockNamespaceOperatorMockRecorder) Reconcile(ctx, req, r interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Reconcile", reflect.TypeOf((*MockNamespaceOperator)(nil).Reconcile), ctx, req, r)
+}
+
+// MockDeploymentReferenceController is a mock of DeploymentReferenceController interface.
+type MockDeploymentReferenceController struct {
+	ctrl     *gomock.Controller
+	recorder *MockDeploymentReferenceControllerMockRecorder
+}
+
+// MockDeploymentReferenceControllerMockRecorder is the mock recorder for MockDeploymentReferenceController.
+type MockDeploymentReferenceControllerMockRecorder struct {
+	mock *MockDeploymentReferenceController
+}
+
+// NewMockDeploymentReferenceController creates a new mock instance.
+func NewMockDeploymentReferenceController(ctrl *gomock.Controller) *MockDeploymentReferenceController {
+	mock := &MockDeploymentReferenceController{ctrl: ctrl}
+	mock.recorder = &MockDeploymentReferenceControllerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockDeploymentReferenceController) EXPECT() *MockDeploymentReferenceControllerMockRecorder {
+	return m.recorder
+}
+
+// SetControllerReference mocks base method.
+func (m *MockDeploymentReferenceController) SetControllerReference(owner, controlled v1.Object, scheme *runtime.Scheme) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SetControllerReference", owner, controlled, scheme)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SetControllerReference indicates an expected call of SetControllerReference.
+func (mr *MockDeploymentReferenceControllerMockRecorder) SetControllerReference(owner, controlled, scheme interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetControllerReference", reflect.TypeOf((*MockDeploymentReferenceController)(nil).SetControllerReference), owner, controlled, scheme)
+}
+
+// MockServiceReferenceController is a mock of ServiceReferenceController interface.
+type MockServiceReferenceController struct {
+	ctrl     *gomock.Controller
+	recorder *MockServiceReferenceControllerMockRecorder
+}
+
+// MockServiceReferenceControllerMockRecorder is the mock recorder for MockServiceReferenceController.
+type MockServiceReferenceControllerMockRecorder struct {
+	mock *MockServiceReferenceController
+}
+
+// NewMockServiceReferenceController creates a new mock instance.
+func NewMockServiceReferenceController(ctrl *gomock.Controller) *MockServiceReferenceController {
+	mock := &MockServiceReferenceController{ctrl: ctrl}
+	mock.recorder = &MockServiceReferenceControllerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockServiceReferenceController) EXPECT() *MockServiceReferenceControllerMockRecorder {
+	return m.recorder
+}
+
+// IsControlledBy mocks base method.
+func (m *MockServiceReferenceController) IsControlledBy(obj, owner v1.Object) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IsControlledBy", obj, owner)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// IsControlledBy indicates an expected call of IsControlledBy.
+func (mr *MockServiceReferenceControllerMockRecorder) IsControlledBy(obj, owner interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IsControlledBy", reflect.TypeOf((*MockServiceReferenceController)(nil).IsControlledBy), obj, owner)
 }

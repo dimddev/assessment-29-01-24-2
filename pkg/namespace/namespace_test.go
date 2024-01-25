@@ -25,7 +25,7 @@ func TestNamespaceReconcileWithNoErrors(t *testing.T) {
 
 	mockCtrl := gomock.NewController(t)
 
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 	logger := pkg.NewMockLogOperator(mockCtrl)
 
 	reconciler := NewNamespaceReconciler(logger)
@@ -99,7 +99,7 @@ func TestNamespaceReconcileWithErrors(t *testing.T) {
 
 	mockCtrl := gomock.NewController(t)
 
-	apiClient := pkg.NewMockApiClientOperator(mockCtrl)
+	apiClient := pkg.NewMockAPIClientOperator(mockCtrl)
 	logger := pkg.NewMockLogOperator(mockCtrl)
 
 	reconciler := NewNamespaceReconciler(logger)
